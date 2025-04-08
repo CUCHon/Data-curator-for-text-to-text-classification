@@ -97,6 +97,8 @@ class NaturalInstructions(datasets.GeneratorBasedBuilder):
                         "input": datasets.Value("string"),
                         "output": [datasets.Value("string")]
                     },
+                    # "output_space": [datasets.Value("string")],  # 
+                    # "output_space_size": datasets.Value("int32"),
                     "Instance License": [datasets.Value("string")]
                 }
             ),
@@ -191,6 +193,10 @@ class NaturalInstructions(datasets.GeneratorBasedBuilder):
                 with open(task_path, encoding="utf-8") as task_f:
                     s = task_f.read()
                     task_data = json.loads(s)
+                    # # 如果task data 没有output_space_size, 输出task name
+                    # if "output_space_size" not in task_data:
+                    #     print(f"task {task_name} does not have output_space_size")
+                    #     exit()
                     task_data["Task"] = task_name
                     if "Instruction Source" in task_data:
                         task_data.pop("Instruction Source")

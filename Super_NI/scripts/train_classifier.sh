@@ -14,7 +14,7 @@ export CUDA_DEVICE_ORDER="PCI_BUS_ID"
 export TRANSFORMERS_CACHE=/scratch/rml6079/.cache/huggingface
 export CUDA_LAUNCH_BLOCKING="1"
 
-port=$(shuf -i25000-30000 -n1)
+
 
 # convert train_mix_gen to boolean
 if [ "$train_mix_gen" -eq 1 ]; then
@@ -32,7 +32,11 @@ output_dir=output_classifier/${model}-mix_gen_${train_mix_gen}
 Tk_instruct_cache_dir=/scratch/rml6079/project/Tk-Instruct/cache/
 lr_proj=3e-3
 
-deepspeed --master_port $port src/run_classifier.py \
+export WANDB_API_KEY="cdb15c74cefa62cff276f12a6968ae8847ea2712"
+
+port=$(shuf -i25000-30000 -n1)
+
+python src/run_classifier.py \
     --do_train \
     --do_predict \
     --predict_with_generate \
@@ -66,7 +70,6 @@ deepspeed --master_port $port src/run_classifier.py \
     --evaluation_strategy epoch \
     --save_strategy no \
     --save_steps 2500 \
-    --deepspeed ds_configs/stage2.config \
     --bf16 \
     --run_name train_classifier-mix_gen_${train_mix_gen} \
     --seed 42 \

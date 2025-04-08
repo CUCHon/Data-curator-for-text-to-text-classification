@@ -20,7 +20,7 @@ def FindAllSuffix(task_path,sufix="json"):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--training_data_path",type=str,default='./tasks')
-    parser.add_argument("--target_save_path",type=str,default="./tasks/add_output_space")
+    parser.add_argument("--target_save_path",type=str,default="./tasks/add_output_space_?")
     parser.add_argument("--split_path",type=str,default="./splits/default")
     parser.add_argument("--category_path",type=str,default="./splits/categories_cls_gen.json")
     parser.add_argument("--emperical_max_output_space",type=int,default=100, help="The max output space of a classificaiton task, empirically decided.")

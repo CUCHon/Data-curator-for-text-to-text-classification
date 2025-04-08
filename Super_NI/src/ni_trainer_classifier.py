@@ -2,7 +2,7 @@ import torch.nn as nn
 
 from transformers import Seq2SeqTrainer, Trainer
 from transformers.trainer import *
-
+from typing import Optional, List #新版本需要 老版本存疑
 class DenserEvalCallback(TrainerCallback):
 
     def on_step_end(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):

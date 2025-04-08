@@ -32,7 +32,7 @@ Tk_instruct_cache_dir=/scratch/rml6079/project/Tk-Instruct/cache/
 export lr=1e-05
 output_dir=output_generator/${model}-mix_gen_${train_mix_gen}/lr_${lr}
 
-deepspeed --master_port $port src/run_s2s.py \
+python src/run_s2s.py \
     --do_train \
     --do_predict \
     --predict_with_generate \
@@ -66,7 +66,6 @@ deepspeed --master_port $port src/run_s2s.py \
     --evaluation_strategy epoch \
     --save_strategy no \
     --save_steps 2500 \
-    --deepspeed ds_configs/stage2.config \
     --bf16 \
     --run_name train_generator-mix_gen_${train_mix_gen} \
     --seed 42 \
@@ -76,7 +75,7 @@ deepspeed --master_port $port src/run_s2s.py \
 export lr=3e-05
 output_dir=output_generator/${model}-mix_gen_${train_mix_gen}/lr_${lr}
 
-deepspeed --master_port $port src/run_s2s.py \
+python src/run_s2s.py \
     --do_train \
     --do_predict \
     --predict_with_generate \
@@ -110,7 +109,6 @@ deepspeed --master_port $port src/run_s2s.py \
     --evaluation_strategy epoch \
     --save_strategy no \
     --save_steps 2500 \
-    --deepspeed ds_configs/stage2.config \
     --bf16 \
     --run_name train_generator-mix_gen_${train_mix_gen} \
     --seed 42 \
@@ -119,7 +117,7 @@ deepspeed --master_port $port src/run_s2s.py \
 export lr=1e-04
 output_dir=output_generator/${model}-mix_gen_${train_mix_gen}/lr_${lr}
 
-deepspeed --master_port $port src/run_s2s.py \
+python src/run_s2s.py \
     --do_train \
     --do_predict \
     --predict_with_generate \
@@ -153,7 +151,6 @@ deepspeed --master_port $port src/run_s2s.py \
     --evaluation_strategy epoch \
     --save_strategy no \
     --save_steps 2500 \
-    --deepspeed ds_configs/stage2.config \
     --bf16 \
     --run_name train_generator-mix_gen_${train_mix_gen} \
     --seed 42 \

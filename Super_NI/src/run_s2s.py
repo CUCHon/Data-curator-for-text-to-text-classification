@@ -28,8 +28,9 @@ from typing import Optional
 import datasets
 import nltk  # Here to have a nice missing dependency error message early on
 import numpy as np
-from datasets.utils import set_progress_bar_enabled
-from datasets import load_dataset, load_metric
+from datasets import disable_progress_bar, enable_progress_bar  # 新版本datasets
+# from datasets.utils import set_progress_bar_enabled #老版本datasets
+from datasets import load_dataset
 
 import transformers
 from filelock import FileLock
@@ -54,7 +55,8 @@ from ni_collator import DataCollatorForNI
 from ni_trainer import NITrainer, DenserEvalCallback
 from compute_metrics import compute_metrics, compute_grouped_metrics
 
-set_progress_bar_enabled(False)
+disable_progress_bar()#新版本datasets
+# set_progress_bar_enabled(False) #老版本datasets
 logger = logging.getLogger(__name__)
 
 try:
@@ -322,8 +324,10 @@ def main():
         max_num_instances_per_task=data_args.max_num_instances_per_task,
         max_num_instances_per_eval_task=data_args.max_num_instances_per_eval_task,
         train_mix_gen=data_args.train_mix_gen,
+        trust_remote_code=True,
     )
-
+    
+#有的版本需要 trust_remote_code=True
     print(raw_datasets)
     # exit()
     
@@ -495,7 +499,7 @@ def main():
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
-        trainer.save_model()  # Saves the tokenizer too for easy upload
+        # trainer.save_model()  # Saves the tokenizer too for easy upload
 
         metrics = train_result.metrics
         max_train_samples = (
@@ -505,7 +509,7 @@ def main():
 
         trainer.log_metrics("train", metrics)
         trainer.save_metrics("train", metrics)
-        trainer.save_state()
+        # trainer.save_state()
 
         all_metrics.update(metrics)
 

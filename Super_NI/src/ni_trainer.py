@@ -2,10 +2,12 @@ import string
 import re
 from transformers.trainer_seq2seq import Seq2SeqTrainer
 from transformers.trainer import *
-from datasets import load_metric
 from transformers.trainer_callback import TrainerCallback
+from typing import Optional, List, Dict, Any, Tuple #新版本需要，老版本存疑
 
 
+    
+    # 其余代码保持不变
 class DenserEvalCallback(TrainerCallback):
 
     def on_step_end(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
@@ -24,6 +26,23 @@ class DenserEvalCallback(TrainerCallback):
 
 
 class NITrainer(Seq2SeqTrainer):
+
+    #新版本需要这个方法，老版本存疑
+    def evaluate( 
+        self,
+        eval_dataset=None,
+        ignore_keys=None,
+        metric_key_prefix="eval",
+        max_length=None,
+        num_beams=None
+    ):
+        self._max_length = max_length
+        self._num_beams = num_beams
+        return super().evaluate(
+            eval_dataset=eval_dataset,
+            ignore_keys=ignore_keys,
+            metric_key_prefix=metric_key_prefix
+        )
 
     # rewrite the evaluation loop, with customized call to compute_metrics
     def evaluation_loop(
@@ -80,8 +99,8 @@ class NITrainer(Seq2SeqTrainer):
         # Do this before wrapping.
         eval_dataset = dataloader.dataset
 
-        if is_torch_tpu_available():
-            dataloader = pl.ParallelLoader(dataloader, [args.device]).per_device_loader(args.device)
+        # if is_torch_tpu_available():
+        #     dataloader = pl.ParallelLoader(dataloader, [args.device]).per_device_loader(args.device)
 
         if args.past_index >= 0:
             self._past = None
@@ -111,8 +130,8 @@ class NITrainer(Seq2SeqTrainer):
             # Prediction step
             loss, logits, labels = self.prediction_step(model, inputs, prediction_loss_only, ignore_keys=ignore_keys)
 
-            if is_torch_tpu_available():
-                xm.mark_step()
+            # if is_torch_tpu_available():
+            #     xm.mark_step()
 
             # Update containers on host
             if loss is not None:
@@ -239,12 +258,17 @@ class NITrainer(Seq2SeqTrainer):
         inputs = self._prepare_inputs(inputs)
 
         # XXX: adapt synced_gpus for fairscale as well
+        # gen_kwargs = {
+        #     "max_length": self._max_length if self._max_length is not None else self.model.config.max_length,
+        #     "num_beams": self._num_beams if self._num_beams is not None else self.model.config.num_beams,
+        #     "synced_gpus": True if is_deepspeed_zero3_enabled() else False,
+        # }
+
         gen_kwargs = {
             "max_length": self._max_length if self._max_length is not None else self.model.config.max_length,
             "num_beams": self._num_beams if self._num_beams is not None else self.model.config.num_beams,
-            "synced_gpus": True if is_deepspeed_zero3_enabled() else False,
-        }
-
+            "synced_gpus":  False,
+        } #无ds版本
         if "attention_mask" in inputs:
             gen_kwargs["attention_mask"] = inputs.get("attention_mask", None)
 

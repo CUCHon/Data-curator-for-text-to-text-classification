@@ -1,4 +1,11 @@
 #!/bin/bash
+
+
+
+
+
+
+
 gpu=$1
 batch=$2
 model=$3
@@ -13,7 +20,7 @@ export CUDA_DEVICE_ORDER="PCI_BUS_ID"
 export TRANSFORMERS_CACHE=/scratch/rml6079/.cache/huggingface
 export CUDA_LAUNCH_BLOCKING="1"
 
-port=$(shuf -i25000-30000 -n1)
+
 
 # convert train_mix_gen to boolean
 if [ "$train_mix_gen" -eq 1 ]; then
@@ -31,7 +38,7 @@ output_dir=output_generator/${model}-mix_gen_${train_mix_gen}
 Tk_instruct_cache_dir=/scratch/rml6079/project/Tk-Instruct/cache/
 lr=5e-4
 
-deepspeed --master_port $port src/upload_generator.py \
+python src/upload_generator.py \
     --model_name_or_path ${output_dir} \
     --max_source_length 1024 \
     --max_target_length 128 \
@@ -62,7 +69,6 @@ deepspeed --master_port $port src/upload_generator.py \
     --evaluation_strategy epoch \
     --save_strategy no \
     --save_steps 2500 \
-    --deepspeed ds_configs/stage2.config \
     --bf16 \
     --run_name train_generator-mix_gen_${train_mix_gen} \
     --seed 42 \
