@@ -4,9 +4,9 @@ from transformers.trainer_seq2seq import Seq2SeqTrainer
 from transformers.trainer import *
 from transformers.trainer_callback import TrainerCallback
 from typing import Optional, List, Dict, Any, Tuple #新版本需要，老版本存疑
+# from transformers.integrations import is_deepspeed_zero3_enabled #4.48 transformers新版本需要
 
-
-    
+# 在文件顶部添加这行导入
     # 其余代码保持不变
 class DenserEvalCallback(TrainerCallback):
 
@@ -258,17 +258,17 @@ class NITrainer(Seq2SeqTrainer):
         inputs = self._prepare_inputs(inputs)
 
         # XXX: adapt synced_gpus for fairscale as well
-        # gen_kwargs = {
-        #     "max_length": self._max_length if self._max_length is not None else self.model.config.max_length,
-        #     "num_beams": self._num_beams if self._num_beams is not None else self.model.config.num_beams,
-        #     "synced_gpus": True if is_deepspeed_zero3_enabled() else False,
-        # }
-
         gen_kwargs = {
             "max_length": self._max_length if self._max_length is not None else self.model.config.max_length,
             "num_beams": self._num_beams if self._num_beams is not None else self.model.config.num_beams,
-            "synced_gpus":  False,
-        } #无ds版本
+            "synced_gpus": True if is_deepspeed_zero3_enabled() else False,
+        }
+
+        # gen_kwargs = {
+        #     "max_length": self._max_length if self._max_length is not None else self.model.config.max_length,
+        #     "num_beams": self._num_beams if self._num_beams is not None else self.model.config.num_beams,
+        #     "synced_gpus":  False,
+        # } #无ds版本
         if "attention_mask" in inputs:
             gen_kwargs["attention_mask"] = inputs.get("attention_mask", None)
 

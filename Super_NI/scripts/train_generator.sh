@@ -4,15 +4,15 @@
 
 
 
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=128G
+#SBATCH --cpus-per-task=64
+#SBATCH --mem=400G
 #SBATCH --partition=bigTiger
 #job name 
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:8
 #gpu number
 
 #SBATCH --time=3-10:00:01
-#SBATCH --nodelist=itiger01
+#SBATCH --nodelist=itiger04
 #SBATCH --output=/project/ghan/logs/output/output_%j.txt               # Output log file (%j will be replaced by the job ID)
 #SBATCH --error=/project/ghan/logs/erros/error_%j.txt  
 #SBATCH --job-name=t2t
@@ -22,14 +22,16 @@
 
 
 
-gpu=0
-batch=8
+gpu=0,1,2,3,4,5,6,7
+batch=16
 model=t5-large # t5-base, t5-large, t5-3b, t5-11b, t5-small
 train_mix_gen=0  # 0 or 1
 lr=2e-5
 
 
 set -x
+
+
 
 echo "export CUDA_VISIBLE_DEVICES=$gpu"
 
@@ -58,9 +60,9 @@ Tk_instruct_cache_dir=/project/ghan/text-classification/Super_NI/scratch/rml6079
 export WANDB_API_KEY="cdb15c74cefa62cff276f12a6968ae8847ea2712"
 
 port=$(shuf -i25000-30000 -n1)
-
-# deepspeed --master_port $port src/run_s2s.py \
-python src/run_s2s.py \
+# python src/run_s2s.py \
+deepspeed --master_port $port src/run_s2s.py \
+     --deepspeed ds_configs/stage2.config \
     --do_train \
     --do_predict \
     --predict_with_generate \

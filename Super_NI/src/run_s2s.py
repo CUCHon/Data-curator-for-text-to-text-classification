@@ -276,7 +276,32 @@ def main():
     transformers.utils.logging.enable_default_handler()
     transformers.utils.logging.enable_explicit_format()
     
-    wandb.init(project="CLS_GEN", config=vars(training_args), name=training_args.run_name)
+    
+    # wandb.init(project="CLS_GEN", config=vars(training_args), name=training_args.run_name) 原始设定
+    #屏蔽deepspeed设置
+    # 创建不包含 deepspeed 的配置字典
+    # print("################################################")
+    
+    # print(training_args)
+    
+    # print("################################################")
+    # exit()
+# 只记录重要参数
+    important_params = {
+        'learning_rate': training_args.learning_rate,
+        'batch_size': training_args.per_device_train_batch_size,
+        'num_epochs': training_args.num_train_epochs,
+        'gradient_accumulation_steps': training_args.gradient_accumulation_steps,
+        'weight_decay': training_args.weight_decay,
+        'warmup_steps': training_args.warmup_steps,
+        'bf16': training_args.bf16,
+        'prediction_with_generate': training_args.predict_with_generate,
+        'seed': training_args.seed
+    }
+
+    wandb.init(project="CLS_GEN", config=important_params, name=training_args.run_name)
+    
+    
 
     # Log on each process the small summary:
     logger.warning(
@@ -324,7 +349,7 @@ def main():
         max_num_instances_per_task=data_args.max_num_instances_per_task,
         max_num_instances_per_eval_task=data_args.max_num_instances_per_eval_task,
         train_mix_gen=data_args.train_mix_gen,
-        trust_remote_code=True,
+        # trust_remote_code=True,
     )
     
 #有的版本需要 trust_remote_code=True
